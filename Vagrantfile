@@ -2,7 +2,6 @@ Vagrant.configure("2") do |config|
 
     config.vm.provision "shell", path: ".vagrant/provision/global.sh"
     config.vm.post_up_message = "VM-Machine URLs: web.pleasure-plants.local, sql.pleasure-plants.local <web|sql>"
-    config.ssh.insert_key = false
 
     config.hostmanager.enabled = true
     config.hostmanager.manage_host = false
