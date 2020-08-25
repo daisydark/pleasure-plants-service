@@ -1,0 +1,8 @@
+{
+    "http-basic": {
+        "gitlab.lshop.nroute.de": {
+            "username": "composer",
+            "password": "WW3aYIolarCgvNczbSWY"
+        }
+    }
+}

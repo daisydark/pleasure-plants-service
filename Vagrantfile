@@ -1,26 +1,33 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
 Vagrant.configure("2") do |config|
 
-    config.vm.provision "shell", path: ".vagrant/provision/global.sh"
-    config.vm.post_up_message = "VM-Machine URLs: web.pleasure-plants.local, sql.pleasure-plants.local <web|sql>"
-    config.ssh.insert_key = false
+  config.vm.box_check_update = false
 
-    config.hostmanager.enabled = true
-    config.hostmanager.manage_host = false
-    config.hostmanager.manage_guest = true
-    config.hostmanager.ignore_private_ip = false
-    config.hostmanager.include_offline = true
-
-    config.vm.define "web" do |web|
-      web.vm.box = "ubuntu/bionic64"
-      web.vm.hostname = "web.pleasure-plants.local"
-      web.vm.network "private_network", ip: "192.168.60.22"
-      web.hostmanager.aliases =%w(sql.pleasure-plants.local)
-    end
-
-    config.vm.define "sql" do |sql|
-      sql.vm.box = "ubuntu/bionic64"
-      sql.vm.provision :shell, path: ".vagrant/provision/sql.sh"
-      sql.vm.hostname = "sql.pleasure-plants.local"
-      sql.vm.network "private_network", ip: "192.168.60.23"
-    end
+  config.vm.define "service" do |service|
+      service.vm.box = "generic/alpine38"
+      service.vm.network "private_network", ip: "192.168.60.10"
+      service.vm.synced_folder ".", "/vagrant"
+      service.vm.provision "shell", inline: <<-SHELL
+          apk --no-cache add docker python3-dev libffi-dev openssl-dev gcc libc-dev make
+          rc-update add docker boot
+          sed -i 's|DOCKER_OPTS=""|DOCKER_OPTS="-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock"|' /etc/conf.d/docker
+          service docker start
+          pip3 --no-cache-dir install docker-compose
+      SHELL
+      service.vm.provider "virtualbox" do |vb|
+          vb.customize ["modifyvm", :id, "--memory", "2048"]
+          vb.customize ["modifyvm", :id, "--cpus", "1"]
+          vb.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root", "1"]
+      end
+      service.trigger.before :halt do |trigger|
+          trigger.name = "Stopping all docker containers before shutting down the VM..."
+          trigger.run_remote = {inline: "docker-compose -f /vagrant/docker-compose.yml stop"}
+      end
+      service.trigger.after :up do |trigger|
+          trigger.name = "Start docker containers"
+          trigger.run_remote = {inline: "sysctl -w vm.max_map_count=262144; docker-compose -f /vagrant/docker-compose.yml up -d"}
+      end
+  end
 end
