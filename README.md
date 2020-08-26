@@ -2,7 +2,7 @@
 
     vagrant up
     vagrant ssh
-    sudo docker exec -it web
+    sudo docker exec -it web bash
     composer install
 
 ##Windows hosts
@@ -21,3 +21,9 @@
     Datebase: pleasureplants
     User: root
     Password: root
+
+##Deployment
+
+    FTP:
+    public/
+    vendor/

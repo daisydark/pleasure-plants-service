@@ -1,34 +1,32 @@
 version: '3.7'
 services:
-  lsms-nginx:
+  nginx:
     image: nginx:latest
-    container_name: lsms-nginx
+    container_name: nginx
     depends_on:
-      - lsms-develop
+      - web
     volumes:
       - .docker/nginx/nginx.conf:/etc/nginx/nginx.conf
     ports:
       - 80:80
       - 443:443
-  lsms-develop:
+  web:
     build:
       context: .docker
       dockerfile: develop/Dockerfile
-    container_name: lsms-develop
+    container_name: web
     environment:
-      - CONTAINER_NAME=lsms-develop
+      - CONTAINER_NAME=web
       - TZ=Europe/Berlin
-      - PHP_IDE_CONFIG=serverName=lsms-develop
+      - PHP_IDE_CONFIG=serverName=web
       - XDEBUG_CONFIG=idekey=PHPSTORM
-      - COMPOSER_ALLOW_SUPERUSER=1
-      - COMPOSER=composer-develop.json
     expose:
       - 80
     volumes:
       - .:/var/www
-  lsms-mysql:
+  mysql:
     image: mysql
-    container_name: lsms-mysql
+    container_name: mysql
     command: --default-authentication-plugin=mysql_native_password
     environment:
       - MYSQL_ROOT_PASSWORD=root
@@ -36,8 +34,8 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - lsms-mysqldata:/var/lib/mysql
+      - mysqldata:/var/lib/mysql
       - .docker/mysql/db-initialization:/docker-entrypoint-initdb.d
 volumes:
-  lsms-mysqldata:
+  mysqldata:
     driver: local
