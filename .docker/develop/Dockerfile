@@ -20,9 +20,5 @@ RUN echo "xdebug.idekey=PHPSTORM" >> /usr/local/etc/php/php.ini; \
 RUN a2enmod rewrite
 RUN a2enmod headers
 COPY resources/.ssh/* /root/.ssh/
-COPY resources/.composer/.htaccess /root/.composer/.htaccess
-COPY resources/.composer/auth.json-basic /root/.composer/auth.json-basic
-COPY resources/.composer/auth.json-both /root/.composer/auth.json-both
-COPY resources/.composer/auth.json-oath /root/.composer/auth.json-oath
 RUN chmod 600 /root/.ssh/id_rsa; \
     chmod 644 /root/.ssh/id_rsa.pub

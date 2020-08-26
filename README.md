@@ -15,7 +15,9 @@
 
 ##Database
 
-    Driver: MariaDb
+    Driver: MariaDB
     Host: pleasure-plants.local
+    Port: 3306
+    Datebase: pleasureplants
     User: root
     Password: root
