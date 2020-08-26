@@ -21,9 +21,3 @@
     Datebase: pleasureplants
     User: root
     Password: root
-
-##Deployment
-
-    FTP:
-    public/
-    vendor/
